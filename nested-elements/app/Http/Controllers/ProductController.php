@@ -90,15 +90,8 @@ class ProductController extends Controller
     }
 
 
-    public function show($id) {
-        $product = Product::with([
-            'type',
-            'categories',
-            'attributes.property',
-            'assembly.parts',
-            'children',
-        ])->find($id);
-
+    public function show(Product $product) {
+        // $product->load('assembly');
         return response()->json($product);
     }
 

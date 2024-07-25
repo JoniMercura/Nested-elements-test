@@ -8,9 +8,9 @@ class Part extends Model
 {
     protected $fillable = ['name', 'assembly_id'];
 
-    public function assembly()
+    public function assemblies()
     {
-        return $this->belongsTo(Assembly::class);
+        return $this->belongsToMany(Assembly::class)->withPivot('quantity')->withTimestamps();
     }
 }
 

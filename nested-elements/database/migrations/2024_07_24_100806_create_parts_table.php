@@ -11,7 +11,6 @@ class CreatePartsTable extends Migration
         Schema::create('parts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('assembly_id')->constrained('assemblies')->onDelete('cascade');
             $table->timestamps();
         });
     }

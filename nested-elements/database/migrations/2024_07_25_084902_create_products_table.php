@@ -15,13 +15,10 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 8, 2);
+            $table->decimal('price', 8, 2)->nullable();
             $table->decimal('cost_price', 8, 2)->nullable();
-            $table->integer('number');
-            $table->foreignId('type_id')->nullable()->constrained('types')->onDelete('set null');
-            $table->foreignId('assembly_id')->nullable()->constrained('assemblies')->onDelete('set null');
-            $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('products')->onDelete('cascade');
+            $table->string('number')->nullable();
+            $table->foreignId('assembly_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }
