@@ -13,30 +13,22 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function create()
-    {
-        // Crear un tipo de producto
+    public function create() {
+        // Create a product type
         $type = Type::create(['name' => 'Electronics']);
 
-        // Crear una categoría principal
+        // Create a category an subcategory
         $category = Category::create(['name' => 'Smartphones']);
-
-        // Crear una subcategoría
         $subcategory = Category::create(['name' => 'iPhones', 'parent_id' => $category->id]);
 
-        // Crear una propiedad
+        // Create a property
         $property = Property::create(['name' => 'Color', 'type' => 'string']);
 
-        // Crear un assembly
+        // Create an assembly
         $assembly = Assembly::create(['name' => 'Main Assembly']);
+        $part = Part::create(['name' => 'Battery', 'assembly_id' => $assembly->id]);
 
-        // Crear una parte y asignarla al assembly
-        $part = Part::create([
-            'name' => 'Battery',
-            'assembly_id' => $assembly->id
-        ]);
-
-        // Crear un producto raíz
+        // Create products
         $parentProduct = Product::create([
             'name' => 'iPhone',
             'description' => 'Apple smartphone',
@@ -47,7 +39,6 @@ class ProductController extends Controller
             'assembly_id' => $assembly->id
         ]);
 
-        // Crear un producto hijo
         $childProduct = Product::create([
             'name' => 'iPhone Mini',
             'description' => 'Smaller version of Apple smartphone',
@@ -59,10 +50,32 @@ class ProductController extends Controller
             'assembly_id' => $assembly->id
         ]);
 
-        // Asignar categoría al producto raíz
+        $grandChildProduct = Product::create([
+            'name' => 'iPhone Mini Pro',
+            'description' => 'Pro version of iPhone Mini',
+            'price' => 799.99,
+            'cost_price' => 699.99,
+            'number' => 30,
+            'type_id' => $type->id,
+            'parent_id' => $childProduct->id,
+            'assembly_id' => $assembly->id
+        ]);
+
+        $siblingProduct = Product::create([
+            'name' => 'iPhone Mini Plus',
+            'description' => 'Larger version of iPhone Mini',
+            'price' => 499.99,
+            'cost_price' => 699.99,
+            'number' => 40,
+            'type_id' => $type->id,
+            'assembly_id' => $assembly->id,
+            'parent_id' => $parentProduct->id
+        ]);
+
+        // Asign category to the parent product
         $parentProduct->categories()->attach($subcategory->id);
 
-        // Crear un atributo y asignarlo al producto raíz
+        // Create an attribute and asign to the parent product
         Attribute::create([
             'name' => 'Color',
             'value' => 'Black',
@@ -71,11 +84,11 @@ class ProductController extends Controller
             'product_id' => $parentProduct->id
         ]);
 
-        return "Product created successfully!";
+        return "Products created successfully!";
     }
 
-    public function show($id)
-    {
+
+    public function show($id) {
         $product = Product::with([
             'type',
             'categories',
@@ -85,5 +98,53 @@ class ProductController extends Controller
         ])->find($id);
 
         return response()->json($product);
+    }
+
+    public function testRecursiveRelationships() {
+        // Get descendants of a product
+        $product = Product::with('descendants')->find(12); 
+        $productDescendants = $product->descendants;
+
+        // Get ancestors
+        $productWithAncestors = Product::with('ancestors')->find(14); 
+        $productAncestors = $productWithAncestors->ancestors;
+
+        // Get siblings
+        $productWithSiblings = Product::with('siblings')->find(13); 
+        $productSiblings = $productWithSiblings->siblings;
+
+        // Get root ancestor
+        $productWithRootAncestor = Product::find(14);  
+        $rootAncestor = $productWithRootAncestor->rootAncestor;
+
+        return response()->json([
+            'product' => $product,
+            'descendants' => $productDescendants,
+            'ancestors' => $productAncestors,
+            'siblings' => $productSiblings,
+            'rootAncestor' => $rootAncestor
+        ]);
+    }
+
+    public function tree() {
+        // Get full tree
+        $tree = Product::tree()->get();
+
+        return response()->json(['tree' => $tree]);
+    }
+
+    public function testAdditionalMethods($childId, $parentId) {
+        $child = Product::find($childId);
+        $parent = Product::find($parentId);
+
+        $isChildOf = $child->isChildOf($parent);
+        $isParentOf = $parent->isParentOf($child);
+        $depthRelatedTo = $child->getDepthRelatedTo($parent);
+
+        return response()->json([
+            'is_child_of' => $isChildOf,
+            'is_parent_of' => $isParentOf,
+            'depth_related_to' => $depthRelatedTo
+        ]);
     }
 }
