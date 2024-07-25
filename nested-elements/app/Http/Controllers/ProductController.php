@@ -26,7 +26,9 @@ class ProductController extends Controller
 
         // Create an assembly
         $assembly = Assembly::create(['name' => 'Main Assembly']);
-        $part = Part::create(['name' => 'Battery', 'assembly_id' => $assembly->id]);
+        $part1 = Part::create(['name' => 'Battery', 'assembly_id' => $assembly->id]);
+        $part2 = Part::create(['name' => 'Screen', 'assembly_id' => $assembly->id]);
+        $part3 = Part::create(['name' => 'Camera', 'assembly_id' => $assembly->id]);
 
         // Create products
         $parentProduct = Product::create([
@@ -102,19 +104,19 @@ class ProductController extends Controller
 
     public function testRecursiveRelationships() {
         // Get descendants of a product
-        $product = Product::with('descendants')->find(12); 
+        $product = Product::with('descendants')->find(16); 
         $productDescendants = $product->descendants;
 
         // Get ancestors
-        $productWithAncestors = Product::with('ancestors')->find(14); 
+        $productWithAncestors = Product::with('ancestors')->find(18); 
         $productAncestors = $productWithAncestors->ancestors;
 
         // Get siblings
-        $productWithSiblings = Product::with('siblings')->find(13); 
+        $productWithSiblings = Product::with('siblings')->find(17); 
         $productSiblings = $productWithSiblings->siblings;
 
         // Get root ancestor
-        $productWithRootAncestor = Product::find(14);  
+        $productWithRootAncestor = Product::find(18);  
         $rootAncestor = $productWithRootAncestor->rootAncestor;
 
         return response()->json([
