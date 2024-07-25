@@ -94,7 +94,7 @@ class ProductController extends Controller
             'categories',
             'attributes.property',
             'assembly.parts',
-            'children'
+            'children',
         ])->find($id);
 
         return response()->json($product);
@@ -133,18 +133,24 @@ class ProductController extends Controller
         return response()->json(['tree' => $tree]);
     }
 
-    public function testAdditionalMethods($childId, $parentId) {
-        $child = Product::find($childId);
-        $parent = Product::find($parentId);
+    public function testAdditionalMethods() {
+        $rootProduct = Product::find(12);
+        $firstLevelProduct = Product::find(13);
+        $secondLevelProduct = Product::find(14);
 
-        $isChildOf = $child->isChildOf($parent);
-        $isParentOf = $parent->isParentOf($child);
-        $depthRelatedTo = $child->getDepthRelatedTo($parent);
+        // Check if second level product is child of first level product
+        $isChildOf = $secondLevelProduct->isChildOf($firstLevelProduct); // true
+
+        // Check if root product is parent of first level product
+        $isParentOf = $rootProduct->isParentOf($firstLevelProduct); // true
+
+        // Get depth related to root product
+        $depthRelatedTo = $secondLevelProduct->getDepthRelatedTo($rootProduct); // Output: 2
 
         return response()->json([
-            'is_child_of' => $isChildOf,
-            'is_parent_of' => $isParentOf,
-            'depth_related_to' => $depthRelatedTo
+            'isChildOf' => $isChildOf,
+            'isParentOf' => $isParentOf,
+            'depthRelatedTo' => $depthRelatedTo
         ]);
     }
 }
