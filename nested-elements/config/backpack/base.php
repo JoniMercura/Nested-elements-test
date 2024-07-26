@@ -127,6 +127,17 @@ return [
     'authentication_column' => 'email',
     'authentication_column_name' => 'Email',
 
+    'authentication' => [
+        'login' => [
+            'controller' => 'App\Http\Controllers\Auth\LoginController@showLoginForm',
+            'view' => 'backpack::auth.login',
+        ],
+        'logout' => [
+            'controller' => 'App\Http\Controllers\Auth\LoginController@logout',
+        ],
+    ],
+
+
     // Backpack assumes that your "database email column" for operations like Login and Register is called "email".
     // If your database email column have a different name, you can configure it here. Eg: `user_mail`
     'email_column' => 'email',
