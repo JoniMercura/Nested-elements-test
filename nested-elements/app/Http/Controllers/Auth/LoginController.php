@@ -7,13 +7,10 @@ use Illuminate\Http\Request;
 use Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
-    public function showLoginForm()
-    {
-        return view('vendor.backpack.base.auth.login');
-    }
 
     public function redirectToGoogle()
     {
@@ -22,9 +19,14 @@ class LoginController extends Controller
 
     public function handleGoogleCallback()
     {
-        $user = Socialite::driver('google')->stateless()->user();
-        $this->loginOrCreateAccount($user, 'google');
-        return redirect()->intended('admin/dashboard');
+        try {
+            $user = Socialite::driver('google')->user();
+            $this->loginOrCreateAccount($user, 'google');
+            return redirect()->intended('admin/dashboard');
+        } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return redirect('/admin')->with('error', 'Something went wrong. Please try again.');
+        }
     }
 
     public function redirectToMicrosoft()
@@ -34,9 +36,14 @@ class LoginController extends Controller
 
     public function handleMicrosoftCallback()
     {
-        $user = Socialite::driver('microsoft')->stateless()->user();
-        $this->loginOrCreateAccount($user, 'microsoft');
-        return redirect()->intended('admin/dashboard');
+        try {
+            $user = Socialite::driver('microsoft')->user();
+            $this->loginOrCreateAccount($user, 'microsoft');
+            return redirect()->intended('admin/dashboard');
+        } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return redirect('/admin')->with('error', 'Something went wrong. Please try again.');
+        }
     }
 
     protected function loginOrCreateAccount($providerUser, $provider)

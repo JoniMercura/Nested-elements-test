@@ -11,7 +11,6 @@ use App\Http\Controllers\Auth\LoginController;
 Route::get('/', function () {
     return redirect('/admin');
 }); 
-// Route::get('/', [LoginController::class, 'showLoginForm']);
 
 Route::get('/create-product', [ProductController::class, 'create']);
 Route::get('/product/{product}', [ProductController::class, 'show']);
@@ -29,3 +28,4 @@ Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallbac
 
 Route::get('auth/microsoft', [LoginController::class, 'redirectToMicrosoft']);
 Route::get('auth/microsoft/callback', [LoginController::class, 'handleMicrosoftCallback']);
+
