@@ -37,8 +37,15 @@ class LoginController extends Controller
     public function handleMicrosoftCallback()
     {
         try {
-            $user = Socialite::driver('microsoft')->user();
-            $this->loginOrCreateAccount($user, 'microsoft');
+            $microsoftUser = Socialite::driver('microsoft')->stateless()->user();
+
+            // Check if the user's email domain matches the company's domain
+            $companyDomain = 'mercura.dk';
+            if (explode('@', $microsoftUser->getEmail())[1] !== $companyDomain) {
+                throw new \Exception('Unauthorized email domain.');
+            }
+
+            $user = $this->loginOrCreateAccount($microsoftUser, 'microsoft');
             return redirect()->intended('admin/dashboard');
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
