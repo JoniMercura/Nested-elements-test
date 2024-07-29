@@ -12,6 +12,7 @@
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.9",
         "socialiteproviders/microsoft": "^4.5",
+        "stancl/tenancy": "^3.8",
         "staudenmeir/laravel-adjacency-list": "*"
     },
     "require-dev": {
