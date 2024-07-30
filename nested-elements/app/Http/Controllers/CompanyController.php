@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Company;
+use App\Models\Tenant;
+use Stancl\Tenancy\Database\Models\Domain;
 
 class CompanyController extends Controller
 {
@@ -19,7 +22,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
+        return view('companies.create');
     }
 
     /**
@@ -27,7 +30,25 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'domain' => 'required|string|max:255|unique:companies,domain',
+        ]);
+
+        $company = Company::create($request->only('name', 'domain'));
+
+        // Create tenant and domain
+        $tenant = Tenant::create([
+            'id' => $company->name,
+            'company_id' => $company->id,
+        ]);
+
+        Domain::create([
+            'domain' => $company->domain,
+            'tenant_id' => $tenant->id,
+        ]);
+
+        return redirect('/admin')->with('success', 'Company created successfully!');
     }
 
     /**

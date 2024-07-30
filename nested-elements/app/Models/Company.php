@@ -9,5 +9,10 @@ class Company extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'domain'];
+
+    public function tenants()
+    {
+        return $this->hasMany(Tenant::class);
+    }
 }

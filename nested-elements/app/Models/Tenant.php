@@ -10,4 +10,22 @@ use Stancl\Tenancy\Database\Concerns\HasDomains;
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
+
+    public static function getCustomColumns(): array
+    {
+        return [
+            'id',
+            'company_id',
+        ];
+    }
+
+    public static function getDataColumn(): string
+    {
+        return 'data';
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

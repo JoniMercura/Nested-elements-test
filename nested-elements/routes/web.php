@@ -6,6 +6,7 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CompanyController;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -26,9 +27,13 @@ foreach (config('tenancy.central_domains') as $domain) {
         // Auth
         Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
         Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
-        
+       
         Route::get('auth/microsoft', [LoginController::class, 'redirectToMicrosoft']);
         Route::get('auth/microsoft/callback', [LoginController::class, 'handleMicrosoftCallback']);
+
+        // Companies
+        Route::get('companies/create', [CompanyController::class, 'create'])->name('companies.create');
+        Route::post('companies', [CompanyController::class, 'store'])->name('companies.store');
     });
 }
 
