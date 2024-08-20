@@ -7,6 +7,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Auth\LoginController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -34,3 +35,5 @@ Route::middleware([
     Route::get('auth/microsoft', [App\Http\Controllers\Auth\LoginController::class, 'redirectToMicrosoft']);
     Route::get('auth/microsoft/callback', [App\Http\Controllers\Auth\LoginController::class, 'handleMicrosoftCallback']);
 });
+
+

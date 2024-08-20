@@ -11,11 +11,24 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
 
+    protected $fillable = [
+        'id',
+        'company_id',
+        'azure_client_id',
+        'azure_client_secret',
+        'azure_redirect_uri',
+        'azure_tenant_id',
+    ];
+
     public static function getCustomColumns(): array
     {
         return [
             'id',
             'company_id',
+            'azure_client_id',
+            'azure_client_secret',
+            'azure_redirect_uri',
+            'azure_tenant_id',
         ];
     }
 

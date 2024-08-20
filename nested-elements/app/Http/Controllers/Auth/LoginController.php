@@ -8,10 +8,12 @@ use Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Resolvers\DomainTenantResolver;
+
 
 class LoginController extends Controller
 {
-
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -29,19 +31,38 @@ class LoginController extends Controller
         }
     }
 
+    protected function getAzureConfig()
+    {
+        $config = [
+            'client_id' => tenant()->azure_client_id,
+            'client_secret' => tenant()->azure_client_secret,
+            'redirect' => tenant()->azure_redirect_uri,
+            'tenant' => tenant()->azure_tenant_id,
+        ];
+        
+        return $config;
+    }
+
     public function redirectToMicrosoft()
     {
+        // Set Azure config for the current tenant
+        config(['services.microsoft' => $this->getAzureConfig()]);
+
         return Socialite::driver('microsoft')->with(['tenant' => config('services.microsoft.tenant')])->redirect();
     }
 
     public function handleMicrosoftCallback()
     {
         try {
+            // Set Azure config for the current tenant
+            config(['services.microsoft' => $this->getAzureConfig()]);
+
             $microsoftUser = Socialite::driver('microsoft')->stateless()->user();
 
             $user = $this->loginOrCreateAccount($microsoftUser, 'microsoft');
 
             return redirect()->intended('admin/dashboard');
+
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return redirect('/admin')->with('error', 'Something went wrong. Please try again.');
