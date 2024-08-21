@@ -23,17 +23,40 @@ class LoginController extends Controller
         $this->keyVaultService = $keyVaultService;
     }
 
+    protected function getGoogleConfig()
+    {
+        $companyName = tenant()->company->name;
+
+        // Get Google secrets from Azure Key Vault
+        $config = [
+            'client_id' => $this->keyVaultService->getSecret($companyName, 'GoogleClientID'),
+            'client_secret' => $this->keyVaultService->getSecret($companyName, 'GoogleClientSecret'),
+            'redirect' => $this->keyVaultService->getSecret($companyName, 'GoogleRedirectURI'),
+        ];
+
+        return $config;
+    }
+
     public function redirectToGoogle()
     {
+        // Set Azure config for the current tenant
+        config(['services.google' => $this->getGoogleConfig()]);
+
         return Socialite::driver('google')->redirect();
     }
 
     public function handleGoogleCallback()
     {
         try {
-            $user = Socialite::driver('google')->user();
-            $this->loginOrCreateAccount($user, 'google');
+            // Set Azure config for the current tenant
+            config(['services.google' => $this->getGoogleConfig()]);
+
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $user = $this->loginOrCreateAccount($googleUser, 'google');
+
             return redirect()->intended('admin/dashboard');
+
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return redirect('/admin')->with('error', 'Something went wrong. Please try again.');
