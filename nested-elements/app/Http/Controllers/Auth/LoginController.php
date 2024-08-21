@@ -10,10 +10,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Resolvers\DomainTenantResolver;
+use App\Services\AzureKeyVaultService;
 
 
 class LoginController extends Controller
 {
+
+    protected $keyVaultService;
+
+    public function __construct(AzureKeyVaultService $keyVaultService)
+    {
+        $this->keyVaultService = $keyVaultService;
+    }
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -33,13 +42,16 @@ class LoginController extends Controller
 
     protected function getAzureConfig()
     {
+        $companyName = tenant()->company->name;  // Get the ID of the current tenant
+
+        // Get secrets from Azure Key Vault
         $config = [
-            'client_id' => tenant()->azure_client_id,
-            'client_secret' => tenant()->azure_client_secret,
-            'redirect' => tenant()->azure_redirect_uri,
-            'tenant' => tenant()->azure_tenant_id,
+            'client_id' => $this->keyVaultService->getSecret($companyName, 'ClientID'),
+            'client_secret' => $this->keyVaultService->getSecret($companyName, 'ClientSecret'),
+            'redirect' => $this->keyVaultService->getSecret($companyName, 'RedirectURI'),
+            'tenant' => $this->keyVaultService->getSecret($companyName, 'TenantID'),
         ];
-        
+
         return $config;
     }
 
